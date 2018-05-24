@@ -1,0 +1,10 @@
+{
+  "generator-openapi-repo": {
+    "importExistingSpec": false,
+    "name": "DevParent",
+    "repo": "sketchings/blog-api",
+    "splitSpec": false,
+    "samples": true,
+    "installSwaggerUI": true
+  }
+}

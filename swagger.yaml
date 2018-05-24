@@ -1,0 +1,195 @@
+swagger: '2.0'
+schemes:
+  - http
+  - https
+host: example.com
+basePath: /api/v1
+info:
+  description: |
+    This is an **example** API to demontstrate features of OpenAPI specification
+    # Introduction
+    This specification is intended to to be a good starting point for describint your API in 
+    [OpenAPI/Swagger format](https://github.com/OAI/OpenAPI-Specification/blob/master/versions/2.0.md).
+    It also demonstrates features of [generator-openapi-repo](https://github.com/Rebilly/generator-openapi-repo) tool and 
+    [ReDoc](https://github.com/Rebilly/ReDoc) documentation engine. So beyond the standard OpenAPI syntax we use a few 
+    [vendor extensions](https://github.com/Rebilly/ReDoc/blob/master/docs/redoc-vendor-extensions.md).
+
+    # OpenAPI Specification
+    The goal of The OpenAPI Specification is to define a standard, language-agnostic interface to REST APIs which
+    allows both humans and computers to discover and understand the capabilities of the service without access to source
+    code, documentation, or through network traffic inspection. When properly defined via OpenAPI, a consumer can 
+    understand and interact with the remote service with a minimal amount of implementation logic. Similar to what
+    interfaces have done for lower-level programming, OpenAPI removes the guesswork in calling the service.
+  version: 1.0.0
+  title: Example.com
+  termsOfService: 'https://example.com/terms/'
+  contact:
+    email: contact@example.com
+    url: 'http://example.com/contact'
+  license:
+    name: Apache 2.0
+    url: 'http://www.apache.org/licenses/LICENSE-2.0.html'
+  x-logo:
+    url: 'https://apis.guru/openapi-template/logo.png'
+externalDocs:
+  description: Find out how to create Github repo for your OpenAPI spec.
+  url: 'https://github.com/Rebilly/generator-openapi-repo'
+produces:
+  - application/json
+  - application/xml
+  - text/csv
+consumes:
+  - application/json
+  - application/xml
+tags:
+  - name: Echo
+    description: Example echo operations
+  - name: User
+    description: Operations about user
+securityDefinitions:
+  main_auth:
+    type: oauth2
+    authorizationUrl: 'http://example.com/api/oauth/dialog'
+    flow: implicit
+    scopes:
+      'read:users': read users info
+      'write:users': modify or remove users
+  api_key:
+    type: apiKey
+    in: header
+    name: api_key
+  basic_auth:
+    type: basic
+paths:
+  '/users/{username}':
+    parameters:
+      - name: pretty_print
+        in: query
+        description: Pretty print response
+        type: boolean
+    get:
+      tags:
+        - User
+      summary: Get user by user name
+      description: |
+        Some description of the operation. 
+        You can use `markdown` here.
+      operationId: getUserByName
+      parameters:
+        - name: username
+          in: path
+          description: The name that needs to be fetched
+          required: true
+          type: string
+        - name: with_email
+          in: query
+          description: Filter users without email
+          type: boolean
+      security:
+        - main_auth:
+            - 'read:users'
+        - api_key: []
+      produces:
+        - application/json
+      responses:
+        '200':
+          description: Success
+          schema:
+            $ref: '#/definitions/User'
+          examples:
+            application/json:
+              username: user1
+              email: user@example.com
+        '403':
+          description: Forbidden
+        '404':
+          description: User not found
+    put:
+      tags:
+        - User
+      summary: Updated user
+      description: This can only be done by the logged in user.
+      operationId: updateUser
+      produces:
+        - application/json
+      parameters:
+        - name: username
+          in: path
+          description: The name that needs to be updated
+          required: true
+          type: string
+        - in: body
+          name: body
+          description: Updated user object
+          required: true
+          schema:
+            $ref: '#/definitions/User'
+      security:
+        - main_auth:
+            - 'write:users'
+      responses:
+        '200':
+          description: OK
+        '400':
+          description: Invalid user supplied
+        '404':
+          description: User not found
+  /echo:
+    post:
+      tags:
+        - Echo
+      summary: Echo test
+      description: Receive the exact message you've sent
+      operationId: echo
+      parameters:
+        - name: message
+          in: body
+          description: Echo payload
+          required: true
+          schema:
+            type: string
+            example: Hello world!
+      security:
+        - api_key: []
+      responses:
+        '200':
+          description: OK
+          examples:
+            application/json: Hello world!
+          schema:
+            type: string
+          headers:
+            X-Rate-Limit:
+              type: integer
+              format: int32
+              description: calls per hour allowed by the user
+            X-Expires-After:
+              type: string
+              format: date-time
+              description: date in UTC when token expires
+definitions:
+  Email:
+    description: User email address
+    type: string
+    format: email
+    example: john.smith@example.com
+  User:
+    type: object
+    properties:
+      username:
+        description: User supplied username
+        type: string
+        minLength: 4
+        example: John78
+      firstName:
+        description: User first name
+        type: string
+        minLength: 1
+        example: John
+      lastName:
+        description: User last name
+        type: string
+        minLength: 1
+        example: Smith
+      email:
+        $ref: '#/definitions/Email'
